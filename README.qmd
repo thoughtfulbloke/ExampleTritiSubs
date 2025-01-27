@@ -1,16 +1,16 @@
-# text processing example
-David Hood
+---
+title: "text processing example"
+author: "David Hood"
+format: gfm
+editor: source
+---
 
-This is an example of taking the day 1 unofficial machine generated
-transcription of Te Triti oral submissions provided by Dr Sanjana
-Hattotuwa at
-https://bsky.app/profile/sanjanah.bsky.social/post/3lgqdi63a6k22 and
-applying some text processing to it using R, as an example of such
-processing.
+This is an example of taking the day 1 unofficial machine generated transcription of Te Triti oral submissions provided by Dr Sanjana Hattotuwa at https://bsky.app/profile/sanjanah.bsky.social/post/3lgqdi63a6k22 and applying some text processing to it using R, as an example of such processing.
 
 The machine transcript has been downloaded to the working directory
 
-``` r
+```{r libraries_used}
+#| warning: false
 library(officer) # automatically accessing word doc contents
 library(stringr) # easy text handling
 library(dplyr) # structuring general data handling
@@ -18,10 +18,9 @@ library(tidyr) # rearranging document structure
 library(ggplot2) # an example graph
 ```
 
-To speed up subsequent runs of the file, I am saving the data from of
-the document contents as that is the major bottleneck
+To speed up subsequent runs of the file, I am saving the data from of the document contents as that is the major bottleneck
 
-``` r
+```{r}
 if(!file.exists("day1.csv")){
   day1_file <- read_docx("Justice Committee - Time Coded.docx")
   day1_content <- docx_summary(day1_file)
@@ -31,11 +30,9 @@ if(!file.exists("day1.csv")){
 day1 <- read.csv("day1.csv")
 ```
 
-Timestamp text is paragraphs of the fomat numbers and :, then a hyphen,
-then more numbers and :. The text in the paragraph after a timestamp is
-associated with that time period.
+Timestamp text is paragraphs of the fomat numbers and :, then a hyphen, then more numbers and :. The text in the paragraph after a timestamp is associated with that time period.
 
-``` r
+```{r}
 day1v2 <- day1 |> 
   mutate(isTime = str_detect(text, pattern = "[1234567890:]+-[1234567890:]+")) 
 day1v2$isContent <- FALSE
@@ -56,10 +53,9 @@ day1v3 <- day1v2 |>
   select(original_paragraph = doc_index, minute_start, minute_end,said)
 ```
 
-As an example, how much did people, per unit time, use the word (or part
-of word) “honour”
+As an example, how much did people, per unit time, use the word (or part of word) "honour"
 
-``` r
+```{r}
 honour_etc <- day1v3 |> 
   mutate(stemcount = str_count(tolower(said), "honour"))
 ggplot(honour_etc, aes(ymax=stemcount, xmin=minute_start, xmax=minute_end)) +
@@ -68,6 +64,7 @@ ggplot(honour_etc, aes(ymax=stemcount, xmin=minute_start, xmax=minute_end)) +
        x="Minute honour* was discussed") +
   theme(panel.grid = element_blank()) +
   scale_y_continuous(breaks=c(0,1))
+  
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-3-1.png)
+
