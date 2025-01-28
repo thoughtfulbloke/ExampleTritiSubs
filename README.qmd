@@ -67,4 +67,25 @@ ggplot(honour_etc, aes(ymax=stemcount, xmin=minute_start, xmax=minute_end)) +
   
 ```
 
+For additional files from additional sessions, it is basically the same process of putting the downloaded docx file in the working directory (normaly the same folder as the script) and customising the name of the file being read in to match, and the name of the variable being stored under. So, for example the read the data in block early on in the above might (for day 2 morning) become
 
+
+```{r}
+if(!file.exists("day2.csv")){
+  day1_file <- read_docx("Justice Committee - Time Coded - Morning session.docx")
+  day1_content <- docx_summary(day1_file)
+  write.csv(day1_content, file="day2.csv", row.names = FALSE)
+}
+
+day2 <- read.csv("day2.csv")
+```
+
+Of course, once you start adding multiple sessions you might want to add a variable for which session they are from, if working with more than one.
+
+```{r}
+#using .1 as a code for morning only, .2 for afternoon, and .3 for full day, you might add the codes
+day1$session <- 1.3
+day2$session <- 2.1
+```
+
+Since having a session variable means that the data can be combined into a singly data set.
